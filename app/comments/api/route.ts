@@ -1,3 +1,3 @@
 export async function GET() {
-    return new Response('Hello Server I am in')
+    return new Response('Hello Server I am in');
 }
