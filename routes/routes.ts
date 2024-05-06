@@ -3,7 +3,7 @@ export const publicRoutes = [
 ];
 
 export const authRoutes = [
-    // '/auth/register',
+    '/auth/register',
     '/auth/login'
 ]
 

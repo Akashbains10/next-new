@@ -17,7 +17,7 @@ export default {
     callbacks: {
         // go to this article to learn aboute protected route using authorized
         // https://fajarwz.com/blog/email-authentication-and-verification-in-nextjs-14-with-next-auth-and-prisma/
-        
+
         // authorized({request: {nextUrl}, auth}) {
         //     console.log(nextUrl, 'nexturl')
         //     return true;
@@ -25,14 +25,13 @@ export default {
         async signIn({ account, user }) {
             if (account?.provider !== 'credentials') return true;
             const findUser = await User.findById(user.id);
-            if (!findUser?.isEmailVerified) return false;   
+            // if (!findUser?.isEmailVerified) return false; 
             return true;
         },
         async session({ session, token }) {
             if (token.sub && session) {
                 session.user.id = token.sub
             }
-            console.log(session, 'session');
             return session;
         },
         async jwt({ token }) {
@@ -54,11 +53,17 @@ export default {
                 };
                 const findUser = await User.findOne({ email: email });
                 if (!findUser) {
-                    throw new Error('User not found')
+                    throw new Error("User not found")
                 }
-                // if (!(await bcrypt.compare(password, findUser.password))) {
-                //     throw new Error('Invalid credentials')
-                // }
+
+                if (!(await bcrypt.compare(password, findUser.password))) {
+                    throw new Error('Invalid credentials');
+                    // return { error: "Incorrect Password", status: false };
+
+                }
+                if (findUser) {
+                    
+                }
                 return findUser;
             },
         })

@@ -11,6 +11,9 @@ import { loginAction } from "./action";
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Select, SelectItem } from "@nextui-org/react";
+import NextSelectField from "@/next-components/Select/NextSelectField";
+import { Error } from "@/components/Error/Error";
 
 type FormValues = {
   email: string;
@@ -30,22 +33,29 @@ const initialState = {
 export const LoginComponent = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const [role, setRole] = useState('admin');
   const { methods } = useHookForm(schema);
   const { formState, control } = methods;
 
 
-  const handleFormSubmit = async (values: any) => {
+  const handleFormSubmit = (values: any) => {
     setLoading(true)
     try {
-      const res = await signIn('credentials', {
+      signIn('credentials', {
         email: values.email,
         password: values.password,
+        role: role,
         redirect: false
-      });
-      console.log(res, 'sign in response')
-      if (res) {
-        router.push('/')
-      }
+      })
+        .then((response) => {
+          console.log(response, 'response*************');
+          if (response) {
+            router.push('/admin')
+          }
+        })
+        .catch((err) => {
+          console.log(err, 'err*****************#######');
+        });
       setLoading(false)
     } catch (error) {
       console.log(error);
@@ -53,12 +63,27 @@ export const LoginComponent = () => {
     }
   }
 
+  const options = [
+    { label: 'User', value: 'user' },
+    { label: 'Admin', value: 'admin' },
+  ];
 
   return (
     <ServerForm<FormValues>
       methods={methods}
       onSubmit={handleFormSubmit}
     >
+      <div className="grid justify-items-end mr-12 my-3">
+        <NextSelectField
+          label="Role"
+          placeholder="Select Role"
+          className="w-40"
+          color="primary"
+          defaultSelected={[role]}
+          setValue={setRole}
+          options={options}
+        />
+      </div>
       <div style={{ paddingLeft: '50px', paddingRight: '50px' }}>
         <InputField
           control={control}
@@ -76,8 +101,8 @@ export const LoginComponent = () => {
           label="Password"
           name="password"
         />
+        <Error type="success" className="mt-3" message="Something went wrong" />
       </div>
-
       <div className="mt-3" style={{ paddingLeft: '50px', paddingRight: '50px' }}>
         <LoadingButton
           variant="contained"
