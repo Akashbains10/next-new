@@ -1,6 +1,7 @@
-export const publicRoutes = [
-    '/'
-];
+export const privateRoutes = [
+    '/admin',
+    '/user'
+]
 
 export const authRoutes = [
     '/auth/register',

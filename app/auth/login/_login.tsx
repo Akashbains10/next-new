@@ -48,9 +48,9 @@ export const LoginComponent = () => {
         redirect: false
       })
         .then((response) => {
-          console.log(response, 'response*************');
           if (response) {
             router.push('/admin')
+            console.log(response, 'response*************');
           }
         })
         .catch((err) => {

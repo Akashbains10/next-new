@@ -3,25 +3,17 @@ import { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from 'bcryptjs';
 import db from "@/utils/connectDB";
+import { getToken } from "next-auth/jwt";
 
+const days = (i: number) => i * 24 * 60 * 60;
 
-async function getUser(email: string, password: string): Promise<any> {
-    return {
-        id: 1,
-        name: 'test user',
-        email: email,
-        password: password,
-    };
-}
 export default {
+    session: {
+        strategy: 'jwt',
+        maxAge: days(1),
+    },
+    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        // go to this article to learn aboute protected route using authorized
-        // https://fajarwz.com/blog/email-authentication-and-verification-in-nextjs-14-with-next-auth-and-prisma/
-
-        // authorized({request: {nextUrl}, auth}) {
-        //     console.log(nextUrl, 'nexturl')
-        //     return true;
-        // },
         async signIn({ account, user }) {
             if (account?.provider !== 'credentials') return true;
             const findUser = await User.findById(user.id);
@@ -31,10 +23,17 @@ export default {
         async session({ session, token }) {
             if (token.sub && session) {
                 session.user.id = token.sub
+                session.user.role = token.role as string
             }
             return session;
         },
         async jwt({ token }) {
+            if (token) {
+                const user = await User.findById({ _id: token.sub })
+                if (user) {
+                    token.role = user.role
+                }
+            }
             return token;
         }
     },
@@ -60,9 +59,6 @@ export default {
                     throw new Error('Invalid credentials');
                     // return { error: "Incorrect Password", status: false };
 
-                }
-                if (findUser) {
-                    
                 }
                 return findUser;
             },

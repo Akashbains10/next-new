@@ -9,32 +9,17 @@ import Form from '@/components/Form/Form';
 import { InputPhone } from '@/components/Form/InputPhone';
 import { PasswordField } from '@/components/Form/PasswordField';
 import { LoadingButton } from '@mui/lab';
-
-const schema = z.object({
-    firstName: z.string({ required_error: 'First name is required' }).min(1),
-    lastName: z.string().optional(),
-    email: z.string({ required_error: 'Email is required' }).min(1),
-    phoneNumber: z.string({ required_error: 'Phone Number is required' }).min(1),
-    password: z.string({ required_error: 'Password is required' })
-        .regex(/[a-zA-Z0-9]/, "Enter valid characters")
-        .min(6, 'Password must contain more than 6 digits'),
-    confirmPassword: z.string({ required_error: 'Confirm password is required' }).min(1)
-})
-    .superRefine(({ confirmPassword, password }, ctx) => {
-        if (confirmPassword !== password) {
-            ctx.addIssue({
-                path: ['confirm_password'],
-                code: 'custom',
-                message: 'The passwords did not match',
-            });
-        }
-    });
-
+import { getServerAuthSession } from '@/server/_auth';
+import personalAction from './submit';
+import { useFormState } from 'react-dom';
+import { personalSchema } from './personalSchema';
 
 export default function PersonalSettings() {
-    const { methods } = useHookForm<SettingsDTO, typeof schema>(schema);
+    const { methods } = useHookForm<SettingsDTO, typeof personalSchema>(personalSchema);
     const { formState, control } = methods;
+    const [state, formAction] = useFormState(personalAction, {status: '', message: ''})
 
+   
     return (
         <ContentWrapper>
             <div>
@@ -43,7 +28,7 @@ export default function PersonalSettings() {
                     <div className="p-3">
                         <h3>Personal Information</h3>
                         <hr />
-                        <Form onSubmit={(values) => console.log(values)} methods={methods}>
+                        <Form onSubmit={(values)=> formAction(values)} methods={methods}>
                             <div className="main-content">
                                 <div className="row mt-2">
                                     <div className="col-md-4">
@@ -99,8 +84,8 @@ export default function PersonalSettings() {
                                     <div className="col-md-4 mt-4 ml-3">
                                         <PasswordField
                                             control={control}
-                                            error={formState.errors['confirmPassword']}
-                                            name='confirmPassword'
+                                            error={formState.errors['confirm_password']}
+                                            name='confirm_password'
                                             label='Confirm Password'
                                         />
                                     </div>
