@@ -3,5 +3,5 @@ export type SettingsDTO = {
     lastName: string,
     email: string,
     password: string,
-    confirmPassword: string
+    confirm_password: string
 }

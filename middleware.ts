@@ -1,32 +1,35 @@
-import { apiRoutes, authRoutes, publicRoutes } from "./routes/routes";
-import NextAuth from "next-auth";
-import authConfig from "./server/auth.config";
-import { NextAuthRequest } from "next-auth/lib";
+import { getToken } from 'next-auth/jwt';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { apiRoutes, authRoutes, privateRoutes } from './routes/routes';
 
-const { auth } = NextAuth(authConfig);
+export default async function middleware(req: NextRequest) {
+  const { nextUrl } = req;
+  const token = await getToken({ req });
+  const isLoggedIn = !!token;
+  const isApiRoute = nextUrl.pathname.startsWith(apiRoutes);
+  const isPrivateRoutes = privateRoutes.includes(nextUrl.pathname)
+  const isAuthRoutes = authRoutes.includes(nextUrl.pathname);
 
-export default auth((req:NextAuthRequest) => {
-    const isLoggedIn = !!req.auth;
-    console.log(req.auth , 'req.auth******************')
-    const { nextUrl } = req;
-    const isApiRoute = nextUrl.pathname.startsWith(apiRoutes);
-    const isPublicRoutes = publicRoutes.includes(nextUrl.pathname);
-    const isAuthRoutes = authRoutes.includes(nextUrl.pathname);
+  if (isApiRoute) return;
 
-    if (isApiRoute) {
-        return;
-    } 
-    if (isAuthRoutes) {
-        if (isLoggedIn) {
-            return Response.redirect(new URL('/', nextUrl))
-        }
-        return;
+  if (isAuthRoutes) {
+    if (isLoggedIn) {
+      if (token?.role === 'admin') {
+        return Response.redirect(new URL('/admin', nextUrl))
+      } else if (token?.role === 'user') {
+        return Response.redirect(new URL('/user', nextUrl))
+      } else {
+        return Response.redirect(new URL('/', nextUrl))
+      }
     }
-    if (!isLoggedIn && !isPublicRoutes) {
-        return Response.redirect(new URL('/auth/login', nextUrl))
-    }
-})
+    return;
+  }
+  
+  if (!isLoggedIn && isPrivateRoutes) return Response.redirect(new URL('/auth/login', nextUrl))
+  return NextResponse.next();
+}
 
 export const config = {
-    matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/(api|trpc)(.*)"],
 }
