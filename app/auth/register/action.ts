@@ -1,7 +1,9 @@
 'use server'
 import User from "@/models/user.model"
 import { registerSchema } from "@/schema/registerSchema";
-import db from "@/utils/connectDB"
+import db from "@/utils/connectDB";
+import bcrypt from 'bcryptjs';
+
 
 export default async function registerAction(prevState: any, formData: FormData) {
     try {
@@ -14,6 +16,7 @@ export default async function registerAction(prevState: any, formData: FormData)
         if (checkUserExists) {
             return { status: 'error', message: 'User already exists' }
         }
+        formData.password = await bcrypt.hash(formData.password, 8);
         await User.create(formData)
         return { status: 'success', message: 'User created Successfuly' }
     } catch (error) {
