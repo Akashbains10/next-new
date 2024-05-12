@@ -36,6 +36,7 @@ export const LoginComponent = () => {
   const [role, setRole] = useState('admin');
   const { methods } = useHookForm(schema);
   const { formState, control } = methods;
+  const [errorProps, setErrorProps] = useState<{ type: string, message: string }>()
 
 
   const handleFormSubmit = (values: any) => {
@@ -49,12 +50,32 @@ export const LoginComponent = () => {
       })
         .then((response) => {
           if (response) {
-            router.push('/admin')
-            console.log(response, 'response*************');
+            if (!response?.ok && response?.error) {
+              setErrorProps({
+                type: 'error',
+                message: response?.error
+              })
+            } else {
+              setErrorProps({
+                type: 'success',
+                message: 'Login successfuly'
+              })
+            }
+            setTimeout(() => {
+              setErrorProps({
+                type: '',
+                message: ''
+              })
+            }, 4000);
+            if (role === 'admin') {
+              router.push('/admin')
+            }else {
+              router.push('/')
+            }
           }
         })
         .catch((err) => {
-          console.log(err, 'err*****************#######');
+          console.log(err, 'err**************');
         });
       setLoading(false)
     } catch (error) {
@@ -101,7 +122,9 @@ export const LoginComponent = () => {
           label="Password"
           name="password"
         />
-        <Error type="success" className="mt-3" message="Something went wrong" />
+        {errorProps && errorProps.type &&
+          <Error type={errorProps?.type} className="mt-3" message={errorProps?.message} />
+        }
       </div>
       <div className="mt-3" style={{ paddingLeft: '50px', paddingRight: '50px' }}>
         <LoadingButton

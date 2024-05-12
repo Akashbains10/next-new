@@ -3,7 +3,7 @@ export const Error = ({
     type,
     className
 }: {
-    type: "success" | "error",
+    type: string,
     message: string;
     className: string;
 }) => {

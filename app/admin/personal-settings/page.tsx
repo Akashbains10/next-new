@@ -1,5 +1,4 @@
 'use client'
-import * as z from 'zod';
 import InputField from "@/components/Form/InputField";
 import ContentWrapper from "@/components/Layout/ContentWrapper";
 import NextBreadCrumb from "@/next-components/BreadCrumbs/NextBreadCrumb";
@@ -9,15 +8,35 @@ import Form from '@/components/Form/Form';
 import { InputPhone } from '@/components/Form/InputPhone';
 import { PasswordField } from '@/components/Form/PasswordField';
 import { LoadingButton } from '@mui/lab';
-import { getServerAuthSession } from '@/server/_auth';
 import personalAction from './submit';
 import { useFormState } from 'react-dom';
 import { personalSchema } from './personalSchema';
+import { useEffect } from 'react';
+import useSnackbar from '@/hooks/useSnackbar';
+import { Alert, Snackbar } from '@mui/material';
+import { useSession } from 'next-auth/react';
+
 
 export default function PersonalSettings() {
     const { methods } = useHookForm<SettingsDTO, typeof personalSchema>(personalSchema);
     const { formState, control } = methods;
+    const {update} = useSession()
+    const {openSnackbar, alertProps, snackProps} = useSnackbar()
     const [state, formAction] = useFormState(personalAction, {status: '', message: ''})
+
+    const handleSubmit = (values: SettingsDTO) => {
+        formAction(values);
+        update();
+    }
+
+    useEffect(()=> {
+        if (state?.status && state?.message) {
+            openSnackbar({
+                type: state.status,
+                message: state.message
+            })
+        }
+    },[state])
 
    
     return (
@@ -28,7 +47,7 @@ export default function PersonalSettings() {
                     <div className="p-3">
                         <h3>Personal Information</h3>
                         <hr />
-                        <Form onSubmit={(values)=> formAction(values)} methods={methods}>
+                        <Form onSubmit={handleSubmit} methods={methods}>
                             <div className="main-content">
                                 <div className="row mt-2">
                                     <div className="col-md-4">
@@ -72,7 +91,7 @@ export default function PersonalSettings() {
                                         />
                                     </div>
 
-                                    <div className="col-md-4 mt-4">
+                                    {/* <div className="col-md-4 mt-4">
                                         <PasswordField
                                             control={control}
                                             error={formState.errors['password']}
@@ -88,7 +107,7 @@ export default function PersonalSettings() {
                                             name='confirm_password'
                                             label='Confirm Password'
                                         />
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="btn">
                                     <LoadingButton
@@ -99,6 +118,7 @@ export default function PersonalSettings() {
                                     </LoadingButton>
                                 </div>
                             </div>
+                            <Snackbar {...snackProps}><Alert {...alertProps} /></Snackbar>
                         </Form>
                     </div>
                 </div>
