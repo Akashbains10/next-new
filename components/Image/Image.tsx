@@ -2,7 +2,7 @@ import placeholder from '@/assets/profile.png';
 import Image from 'next/image'
 
 
-export default function ImageView({ props }: any) {
+export default function ImageView(props: any) {
     const fallback = props?.imageFallback ? props?.imageFallback : placeholder
     return (
         <Image

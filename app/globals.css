@@ -12,3 +12,19 @@
 input.PhoneInputInput:focus {
   outline: none;
 }
+
+.photo {
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dotted grey;
+}
+
+img.custom-image {
+  width: 150px !important;
+  height: 127px !important;
+  border: none !important;
+  object-fit: cover;
+}
