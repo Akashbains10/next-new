@@ -6,39 +6,50 @@ import { useHookForm } from '@/hooks/useHookForm';
 import { SettingsDTO } from './personalType';
 import Form from '@/components/Form/Form';
 import { InputPhone } from '@/components/Form/InputPhone';
-import { PasswordField } from '@/components/Form/PasswordField';
 import { LoadingButton } from '@mui/lab';
 import personalAction from './submit';
 import { useFormState } from 'react-dom';
 import { personalSchema } from './personalSchema';
-import { useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import useSnackbar from '@/hooks/useSnackbar';
 import { Alert, Snackbar } from '@mui/material';
 import { useSession } from 'next-auth/react';
+import profile from '@/assets/image-place.jpg';
+import Image from "next/image";
+import dummyImg from '@/assets/profile.png'
+import ImageView from "@/components/Image/Image";
+import { useSelectFile } from "@/hooks/useSelectFile";
 
 
 export default function PersonalSettings() {
     const { methods } = useHookForm<SettingsDTO, typeof personalSchema>(personalSchema);
     const { formState, control } = methods;
-    const {update} = useSession()
-    const {openSnackbar, alertProps, snackProps} = useSnackbar()
-    const [state, formAction] = useFormState(personalAction, {status: '', message: ''})
+    const { update } = useSession()
+    const { openSnackbar, alertProps, snackProps } = useSnackbar()
+    const [state, formAction] = useFormState(personalAction, { status: '', message: '' })
+    const { file, preview, handleChange } = useSelectFile();
 
     const handleSubmit = (values: SettingsDTO) => {
-        formAction(values);
+        const form = new FormData();
+        (Object.keys(values)as Array<keyof SettingsDTO>).forEach((key)=> {
+            form.append(key, values[key])
+        })
+        if (file) {
+            form.append('image', file)
+        }
+        formAction(form);
         update();
     }
 
-    useEffect(()=> {
+    useEffect(() => {
         if (state?.status && state?.message) {
             openSnackbar({
                 type: state.status,
                 message: state.message
             })
         }
-    },[state])
+    }, [state])
 
-   
     return (
         <ContentWrapper>
             <div>
@@ -47,6 +58,33 @@ export default function PersonalSettings() {
                     <div className="p-3">
                         <h3>Personal Information</h3>
                         <hr />
+                        <div className="mb-3">
+                            <label htmlFor="profile-img">
+                                <div className="photo">
+                                    {preview ?
+                                        <ImageView
+                                            src={preview}
+                                            alt="profile"
+                                            className="custom-image"
+                                            width={155}
+                                            height={100}
+                                        />
+                                        :
+                                        dummyImg ?
+                                            <ImageView
+                                                src={dummyImg}
+                                                alt="profile"
+                                                className="custom-image"
+                                                width={155}
+                                                height={100}
+                                            />
+                                            :
+                                            <Image src={profile} alt="profile" className="custom-image" />
+                                    }
+                                </div>
+                            </label>
+                            <input type="file" id="profile-img" className="d-none" onChange={(e) => handleChange(e)} />
+                        </div>
                         <Form onSubmit={handleSubmit} methods={methods}>
                             <div className="main-content">
                                 <div className="row mt-2">

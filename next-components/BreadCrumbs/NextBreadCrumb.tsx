@@ -8,8 +8,8 @@ export default function NextBreadCrumb({
     return (
         <Breadcrumbs>
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
-            {options?.map(({ label, to }) => (
-                <BreadcrumbItem href={to}>{label}</BreadcrumbItem>
+            {options?.map(({ label, to }, index) => (
+                <BreadcrumbItem key={`${to}-${index}`} href={to}>{label}</BreadcrumbItem>
             ))}
         </Breadcrumbs>
     )
