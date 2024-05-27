@@ -21,6 +21,7 @@ export default async function personalAction(prev: any, formValues: FormData) {
             const file = formValues.get('image') as File;
             if (file) {
                 const resImg = await uploadFile(file)
+                console.log(resImg, 'resImage in submit tsx of line 24')
                 image = resImg;
             }
             const id = session?.user?._id;
