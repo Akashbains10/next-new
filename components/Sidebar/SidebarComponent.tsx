@@ -144,9 +144,17 @@ export const SidebarComponent = ({
               </MenuItem>
             </Menu>
             <Menu menuItemStyles={menuItemStyles}>
-              <MenuItem onClick={to('/admin/categories')} active={active === 'categories'} icon={<i className="fa-solid fa-user"></i>}>
-                Categories
-              </MenuItem>
+              <SubMenu
+                label="Product Management"
+                icon={<i className="fa-solid fa-gift"></i>}
+              >
+                <MenuItem onClick={to('/admin/categories')} active={active === 'categories'} icon={<i className="fa-solid fa-user"></i>}>
+                  Categories
+                </MenuItem>
+                <MenuItem onClick={to('/admin/brands')} active={active === 'categories'} icon={<i className="fa-solid fa-user"></i>}>
+                  Brands
+                </MenuItem>
+              </SubMenu>
             </Menu>
             <Menu menuItemStyles={menuItemStyles}>
               <SubMenu

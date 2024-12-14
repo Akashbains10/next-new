@@ -76,7 +76,7 @@ export default function PersonalSettings() {
                                                 alt="profile"
                                                 className="custom-image"
                                                 width={155}
-                                                height={100}
+                                                height={100}    
                                             />
                                             :
                                             <Image src={profile} alt="profile" className="custom-image" />

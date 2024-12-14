@@ -4,36 +4,50 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "../Image/Image";
 import ImageView from "../Image/Image";
-import { ClassNames } from "@emotion/react";
+import logo from '@/assets/logo2.png'
 
 export default function Header() {
     const router = useRouter();
     const { data } = useSession();
     console.log(data, 'session header')
     return (
-        <Navbar className="bg-slate-200	">
-            <NavbarBrand>
-                {/* <AcmeLogo /> */}
-                <p className="font-bold text-inherit">ACME</p>
+        <Navbar className="bg-slate-200 nav-main">
+            <NavbarBrand className="logo-container">
+                <Image src={logo} alt="logo"/>
             </NavbarBrand>
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
                     <Link color="foreground" href="#">
-                        Features
+                        MEN
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link href="#" aria-current="page">
-                        Customers
+                    <Link color="foreground" href="#">
+                        WOMEN
+                    </Link>
+                </NavbarItem>
+                <NavbarItem isActive>
+                    <Link color="foreground" href="#">
+                        KIDS
+                    </Link>
+                </NavbarItem>
+                <NavbarItem isActive>
+                    <Link color="foreground" href="#">
+                        MOBILE
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
                     <Link color="foreground" href="#">
-                        Integrations
+                        ELECTRONICS
                     </Link>
                 </NavbarItem>
             </NavbarContent>
-            <NavbarContent justify="end">
+            <NavbarContent>
+                <NavbarItem className="nav-field">
+                    <input type="text" />
+                </NavbarItem>
+            </NavbarContent>
+            <NavbarContent justify="end" className="nav-end">
                 {!data?.user ?
                     <>
                         <NavbarItem className="hidden lg:flex">

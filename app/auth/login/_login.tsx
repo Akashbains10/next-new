@@ -38,7 +38,6 @@ export const LoginComponent = () => {
   const { formState, control } = methods;
   const [errorProps, setErrorProps] = useState<{ type: string, message: string }>()
 
-
   const handleFormSubmit = (values: any) => {
     setLoading(true)
     try {
